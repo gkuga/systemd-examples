@@ -1,0 +1,10 @@
+# Sorts before 10-eth1.network, so this is the file eth1 actually uses.
+# Same DHCP setup, but wait-online is told not to wait for eth1.
+[Match]
+Name=eth1
+
+[Link]
+RequiredForOnline=no
+
+[Network]
+DHCP=yes

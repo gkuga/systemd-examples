@@ -1,0 +1,13 @@
+#!/bin/sh
+# Plug in eth1's cable: bring its peer up and serve DHCP on it, so eth1 can
+# actually finish configuring instead of only gaining carrier.
+set -eu
+
+ip -n switch link set eth1 up
+ip -n switch addr replace 192.168.20.1/24 dev eth1
+if [ ! -s /run/switch-dnsmasq.pid ]; then
+    ip netns exec switch dnsmasq \
+        --interface=eth1 --bind-interfaces --port=0 \
+        --dhcp-range=192.168.20.100,192.168.20.200,1h \
+        --pid-file=/run/switch-dnsmasq.pid
+fi

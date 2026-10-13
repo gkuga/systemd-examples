@@ -1,0 +1,13 @@
+[Unit]
+Description=Create eth0 (plugged in) and eth1 (unplugged)
+DefaultDependencies=no
+Before=systemd-networkd.service network-pre.target
+Wants=network-pre.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/fake-cables
+
+[Install]
+WantedBy=sysinit.target

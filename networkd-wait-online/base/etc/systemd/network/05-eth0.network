@@ -1,0 +1,11 @@
+# eth0 is plugged in. A static address keeps the demo free of a DHCP server;
+# it is enough for eth0 to reach "configured" / "routable".
+[Match]
+Name=eth0
+
+[Network]
+Address=192.168.10.2/24
+# Nothing on the "switch" side sends IPv6 router advertisements. With RA
+# acceptance on (the default), networkd keeps eth0 in "configuring" for ~13s
+# while it solicits one, which would blur the timings this demo is about.
+IPv6AcceptRA=no

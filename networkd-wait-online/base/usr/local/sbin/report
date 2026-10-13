@@ -1,0 +1,40 @@
+#!/bin/sh
+# Print what wait-online saw and how long demo-app had to wait.
+
+# Seconds between systemd starting and a unit becoming active.
+since_boot() {
+    start=$(systemctl show -P UserspaceTimestampMonotonic)
+    t=$(systemctl show -P ActiveEnterTimestampMonotonic "$1")
+    if [ "$t" -eq 0 ]; then
+        echo "never"
+    else
+        echo "$(( (t - start) / 1000000 ))s"
+    fi
+}
+
+echo "=== scenario: ${SCENARIO:-stuck}"
+echo
+echo "=== networkctl list"
+networkctl list --no-pager
+echo
+echo "=== .network file per link"
+for link in eth0 eth1; do
+    printf '%s: %s\n' "$link" \
+        "$(networkctl status "$link" --no-pager 2>/dev/null | sed -n 's/^ *Network File: //p')"
+done
+echo
+echo "=== wait-online command line"
+systemctl show -P ExecStart systemd-networkd-wait-online.service \
+    | sed -n 's/.*argv\[\]=\([^;]*\);.*/\1/p'
+echo
+echo "=== result"
+printf 'systemd-networkd-wait-online: %s (%s)\n' \
+    "$(systemctl show -P Result systemd-networkd-wait-online.service)" \
+    "$(systemctl is-active systemd-networkd-wait-online.service)"
+printf 'network-online.target reached after: %s\n' "$(since_boot network-online.target)"
+printf 'demo-app started after:              %s\n' "$(since_boot demo-app.service)"
+echo
+echo "=== journal"
+journalctl -b --no-pager -o short-monotonic \
+    -u systemd-networkd-wait-online.service -u demo-app.service \
+    -u network-online.target

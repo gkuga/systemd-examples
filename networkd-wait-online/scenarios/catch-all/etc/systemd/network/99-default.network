@@ -1,0 +1,11 @@
+# No eth1-specific file, but this catch-all still matches eth1, so eth1 is
+# managed and wait-online waits for it just as in the "stuck" scenario.
+#
+# A real box would typically use Name=!lo. Inside the container the kernel also
+# creates fallback tunnel devices (tunl0, gre0, sit0, ...), and !lo would pull
+# those in as well, so match eth* instead.
+[Match]
+Name=eth*
+
+[Network]
+DHCP=yes

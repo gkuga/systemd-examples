@@ -1,0 +1,13 @@
+# Stands in for an application like sumit: it asks for the network to be
+# "online" before it starts, but only through Wants=, so it still starts when
+# network-online.target fails.
+[Unit]
+Description=Demo application that waits for network-online.target
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/bin/sh -c 'echo "demo-app started"; exec sleep infinity'
+
+[Install]
+WantedBy=multi-user.target

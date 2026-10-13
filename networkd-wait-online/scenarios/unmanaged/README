@@ -1,0 +1,2 @@
+Intentionally empty: no .network file matches eth1, so systemd-networkd leaves
+it unmanaged and wait-online ignores it.

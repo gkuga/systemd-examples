@@ -1,0 +1,20 @@
+#!/bin/sh
+# Build the "outside world" for eth0 and eth1.
+#
+# Each interface is one end of a veth pair. The other end lives in a separate
+# network namespace called "switch", so systemd-networkd in this namespace only
+# ever sees lo, eth0 and eth1 -- just like a real box with two NICs.
+#
+# A veth end only has carrier while its peer is up, so:
+#   eth0: peer up   -> cable plugged in
+#   eth1: peer down -> cable unplugged (no-carrier)
+set -eu
+
+ip netns add switch
+
+ip link add eth0 type veth peer name eth0 netns switch
+ip link add eth1 type veth peer name eth1 netns switch
+
+ip -n switch link set lo up
+ip -n switch link set eth0 up
+ip -n switch addr add 192.168.10.1/24 dev eth0

@@ -1,0 +1,8 @@
+#!/bin/sh
+# Pull eth1's cable out again.
+set -eu
+
+if [ -s /run/switch-dnsmasq.pid ]; then
+    kill "$(cat /run/switch-dnsmasq.pid)" && rm -f /run/switch-dnsmasq.pid
+fi
+ip -n switch link set eth1 down
